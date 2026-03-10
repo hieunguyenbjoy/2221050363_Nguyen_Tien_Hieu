@@ -1,25 +1,24 @@
 @model DemoMVC.Models.Student
 
-<h2>Nhập thông tin sinh viên</h2>
+<h2>Thêm sinh viên</h2>
 
-<form method="post">
-    <div>
-        <label>Mã SV:</label>
-        <input type="text" name="StudentCode" />
-    </div>
+<form asp-action="Create" method="post">
 
-    <div>
-        <label>Họ tên:</label>
-        <input type="text" name="FullName" />
-    </div>
+<div>
+<label>Name</label>
+<input asp-for="Name" />
+</div>
 
-    <button type="submit">Gửi</button>
+<div>
+<label>Age</label>
+<input asp-for="Age" />
+</div>
+
+<div>
+<label>Address</label>
+<input asp-for="Address" />
+</div>
+
+<button type="submit">Save</button>
+
 </form>
-
-@if (Model != null)
-{
-    <hr />
-    <h3>@ViewBag.Message</h3>
-    <p>Mã SV: @Model.StudentCode</p>
-    <p>Họ tên: @Model.FullName</p>
-}

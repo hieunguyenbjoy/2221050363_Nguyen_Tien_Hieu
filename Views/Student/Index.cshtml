@@ -1,0 +1,34 @@
+@model List<DemoMVC.Models.Student>
+
+<h2>Danh sách sinh viên</h2>
+
+<a asp-action="Create">Thêm mới</a>
+
+<table border="1">
+
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Age</th>
+<th>Address</th>
+<th>Action</th>
+</tr>
+
+@foreach(var item in Model)
+{
+<tr>
+
+<td>@item.Id</td>
+<td>@item.Name</td>
+<td>@item.Age</td>
+<td>@item.Address</td>
+
+<td>
+<a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+</td>
+
+</tr>
+}
+
+</table>

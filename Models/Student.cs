@@ -4,9 +4,12 @@ namespace DemoMVC.Models
 {
     public class Student
     {
-        [Key]
-        public string StudentCode { get; set; } = default!;
+        public int Id { get; set; }
 
-        public string FullName { get; set; } = default!;
+        public string Name { get; set; }
+
+        public int Age { get; set; }
+
+        public string Address { get; set; }
     }
 }

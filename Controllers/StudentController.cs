@@ -1,20 +1,22 @@
+using DemoMVC.Data;
 using DemoMVC.Models;
 using Microsoft.AspNetCore.Mvc;
 
-public class StudentController : Controller
+namespace DemoMVC.Controllers
 {
-    // Hiển thị form
-    [HttpGet]
-    public IActionResult Create()
+    public class StudentController : Controller
     {
-        return View();
-    }
+        private readonly ApplicationDbContext _context;
 
-    // Nhận dữ liệu từ form
-    [HttpPost]
-    public IActionResult Create(Student student)
-    {
-        ViewBag.Message = "Thêm sinh viên thành công!";
-        return View(student);   // gửi lại model về view
+        public StudentController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        public IActionResult Index()
+        {
+            var students = _context.Students.ToList();
+            return View(students);
+        }
     }
 }
