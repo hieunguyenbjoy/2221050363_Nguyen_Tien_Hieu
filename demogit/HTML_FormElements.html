@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>bai tap về button</h2>
+
+<button type="button" onclick="alert('xin chao Hieu')">Click vao day!</button>
+<p>chọn vào đây sẽ ra 1 thông báo </p>
+<form action="/action_page.php">
+  <fieldset>
+    <legend>Xac nhạn danh tinh:</legend>
+    <label for="fname">Họ:</label><br>
+    <input type="text" id="fname" name="fname" value="Hieu"><br>
+    <label for="lname">Ten:</label><br>
+    <input type="text" id="lname" name="lname" value="2221050363"><br><br>
+    <input type="submit" value="xac nhan">
+  </fieldset>
+</form>
+<form action="/action_page.php">
+  <input list="browsers" value ="đây là ô chọn ">
+  <datalist id="browsers">
+    <option value="Edge">
+    <option value="Firefox">
+    <option value="Chrome">
+    <option value="Opera">
+    <option value="Safari">
+  </datalist>
+</form>
+<form action="/action_page.php"
+  oninput="x.value=parseInt(a.value)+parseInt(b.value)">
+  0
+  <input type="range"  id="a" name="a" value="50">
+  100 +
+  <input type="number" id="b" name="b" value="50">
+  =
+  <output name="x" for="a b"></output>
+  <br><br>
+  <input type="submit">
+</form>
+
+</body>
+</html>
+
