@@ -1,0 +1,17 @@
+@model DemoMVC.Models.Faculty
+
+<h2>Thêm Khoa</h2>
+
+<form asp-action="Create" method="post">
+
+<div asp-validation-summary="All"></div>
+
+<div>
+    <label>Tên Khoa</label>
+    <input asp-for="FacultyName" />
+    <span asp-validation-for="FacultyName"></span>
+</div>
+
+<button type="submit">Save</button>
+
+</form>

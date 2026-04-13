@@ -1,6 +1,9 @@
-using DemoMVC.Data;
 using DemoMVC.Models;
+using DemoMVC.Data;
+using DemoMVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DemoMVC.Controllers
 {
@@ -12,31 +15,34 @@ namespace DemoMVC.Controllers
         {
             _context = context;
         }
-
-        // Hiển thị danh sách
-        public IActionResult Index()
-        {
-            var students = _context.Students.ToList();
-            return View(students);
-        }
-
-        // Hiển thị form tạo mới
         public IActionResult Create()
         {
+            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName");
             return View();
         }
 
         // Lưu student mới
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Student student)
+        public IActionResult Create(DemoMVC.Models.Student student)
         {
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine(error.ErrorMessage);
+                }
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Students.Add(student);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
+
+            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName");
+
             return View(student);
         }
 
@@ -54,7 +60,7 @@ namespace DemoMVC.Controllers
         // Lưu chỉnh sửa
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, Student student)
+        public IActionResult Edit(int id, DemoMVC.Models.Student student)
         {
             if (id != student.Id) return NotFound();
 
@@ -101,6 +107,20 @@ namespace DemoMVC.Controllers
             if (student == null) return NotFound();
 
             return View(student);
+        }
+        public IActionResult Index()
+{
+            var studentsWithFaculty = _context.Students
+                .Include(s => s.Faculty) // liên kết đến Faculty
+                .Select(s => new StudentFacultyViewModel
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    FacultyName = s.Faculty.FacultyName
+                })
+                .ToList();
+
+            return View(studentsWithFaculty);
         }
     }
 }

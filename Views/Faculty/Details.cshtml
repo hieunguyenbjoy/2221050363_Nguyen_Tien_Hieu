@@ -1,0 +1,37 @@
+@model DemoMVC.Models.Faculty
+
+<h2>Chi tiết Khoa</h2>
+
+<p>
+    <strong>Mã Khoa:</strong> @Model.FacultyId <br />
+    <strong>Tên Khoa:</strong> @Model.FacultyName
+</p>
+
+<h3>Danh sách Sinh viên thuộc khoa này</h3>
+
+@if (Model.Students != null && Model.Students.Any())
+{
+    <table border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Address</th>
+        </tr>
+        @foreach(var student in Model.Students)
+        {
+            <tr>
+                <td>@student.Id</td>
+                <td>@student.Name</td>
+                <td>@student.Age</td>
+                <td>@student.Address</td>
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p>Chưa có sinh viên nào thuộc khoa này.</p>
+}
+
+<a asp-action="Index">Quay lại</a>

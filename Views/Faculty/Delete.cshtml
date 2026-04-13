@@ -1,0 +1,11 @@
+@model DemoMVC.Models.Faculty
+
+<h2>Xóa Khoa</h2>
+
+<p>Bạn có chắc muốn xóa khoa: <strong>@Model.FacultyName</strong> không?</p>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="FacultyId" />
+    <button type="submit">Xóa</button>
+    <a asp-action="Index">Hủy</a>
+</form>
