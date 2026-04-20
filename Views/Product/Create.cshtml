@@ -1,0 +1,17 @@
+@model DemoMVC.Models.Product
+
+<h2>Thêm sản phẩm</h2>
+
+<form asp-action="Create" method="post">
+    <label>Tên sản phẩm:</label>
+    <input asp-for="ProductName" />
+
+    <br />
+
+    <label>Giá:</label>
+    <input asp-for="Price" />
+
+    <br />
+
+    <button type="submit">Lưu</button>
+</form>

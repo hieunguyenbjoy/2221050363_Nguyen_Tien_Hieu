@@ -1,0 +1,25 @@
+@model List<DemoMVC.Models.OrderDetail>
+
+<h2>Chi tiết đơn hàng</h2>
+
+<a href="/OrderDetail/Create">Thêm mới</a>
+
+<table border="1">
+    <tr>
+        <th>Order</th>
+        <th>Product</th>
+        <th>Quantity</th>
+    </tr>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+             @item.Order.Customer.CustomerName <br />
+            <small>Đơn #@item.OrderId - @item.Order.OrderDate</small>
+        </td>
+        <td>@item.Product.ProductName</td>
+        <td>@item.Quantity</td>
+    </tr>
+}
+</table>

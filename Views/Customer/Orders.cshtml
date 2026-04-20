@@ -1,0 +1,23 @@
+@model DemoMVC.Models.Customer
+
+<h2>Đơn hàng của @Model.CustomerName</h2>
+
+@foreach (var order in Model.Orders)
+{
+    <h3>Đơn hàng #@order.OrderId - @order.OrderDate</h3>
+
+    <table border="1">
+        <tr>
+            <th>Sản phẩm</th>
+            <th>Số lượng</th>
+        </tr>
+
+    @foreach (var item in order.OrderDetails)
+    {
+        <tr>
+            <td>@item.Product.ProductName</td>
+            <td>@item.Quantity</td>
+        </tr>
+    }
+    </table>
+}

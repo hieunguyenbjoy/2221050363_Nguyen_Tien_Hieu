@@ -1,0 +1,10 @@
+@model DemoMVC.Models.Customer
+
+<h2>Thêm khách hàng</h2>
+
+<form asp-action="Create" method="post">
+    <label>Tên:</label>
+    <input asp-for="CustomerName" />
+
+    <button type="submit">Lưu</button>
+</form>

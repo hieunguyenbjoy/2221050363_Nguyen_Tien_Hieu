@@ -1,0 +1,18 @@
+@model DemoMVC.Models.Order
+
+<h2>Tạo đơn hàng</h2>
+
+<form asp-action="Create" method="post">
+
+    <label>Ngày đặt:</label>
+    <input asp-for="OrderDate" type="date" />
+
+    <br />
+
+    <label>Khách hàng:</label>
+    <select asp-for="CustomerId" asp-items="ViewBag.Customers"></select>
+
+    <br />
+
+    <button type="submit">Lưu</button>
+</form>

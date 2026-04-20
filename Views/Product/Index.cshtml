@@ -1,0 +1,22 @@
+@model List<DemoMVC.Models.Product>
+
+<h2>Danh sách sản phẩm</h2>
+
+<a href="/Product/Create">Thêm mới</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Tên</th>
+        <th>Giá</th>
+    </tr>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@item.ProductId</td>
+        <td>@item.ProductName</td>
+        <td>@item.Price</td>
+    </tr>
+}
+</table>
