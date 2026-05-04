@@ -365,3 +365,8 @@ C:\Net_Core_API\DemoMVC\obj\Debug\net10.0\refint\DemoMVC.dll
 C:\Net_Core_API\DemoMVC\obj\Debug\net10.0\DemoMVC.pdb
 C:\Net_Core_API\DemoMVC\obj\Debug\net10.0\DemoMVC.genruntimeconfig.cache
 C:\Net_Core_API\DemoMVC\obj\Debug\net10.0\ref\DemoMVC.dll
+C:\Net_Core_API\DemoMVC\bin\Debug\net10.0\EPPlus.dll
+C:\Net_Core_API\DemoMVC\bin\Debug\net10.0\EPPlus.Interfaces.dll
+C:\Net_Core_API\DemoMVC\bin\Debug\net10.0\Microsoft.IO.RecyclableMemoryStream.dll
+C:\Net_Core_API\DemoMVC\bin\Debug\net10.0\System.Security.Cryptography.Pkcs.dll
+C:\Net_Core_API\DemoMVC\bin\Debug\net10.0\runtimes\win\lib\net10.0\System.Security.Cryptography.Pkcs.dll

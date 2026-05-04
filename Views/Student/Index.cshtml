@@ -1,8 +1,12 @@
 @model List<DemoMVC.ViewModels.StudentFacultyViewModel>
 
-<h2>Danh sách sinh viên</h2>
+<<h2>Danh sách sinh viên</h2>
 
-<a asp-action="Create">Thêm mới</a>
+<a href="/Student/Create" class="btn btn-success mb-3">Thêm mới</a>
+
+<a href="/Student/ImportExcel" class="btn btn-primary mb-3">
+    Import Excel
+</a>
 
 <table border="1">
 <tr>

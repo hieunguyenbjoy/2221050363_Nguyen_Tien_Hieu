@@ -1,5 +1,6 @@
 using DemoMVC.Data;
 using Microsoft.EntityFrameworkCore;
+using DemoMVC.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<ExcelService>();
 
 var app = builder.Build();
 
