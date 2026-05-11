@@ -1,0 +1,153 @@
+@model DemoMVC.ViewModels.ImportViewModel
+
+@{
+    ViewData["Title"] = "Tạo Phiếu Nhập Kho";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<form asp-action="Create" method="post" id="importForm">
+    <div class="row">
+        <!-- CỘT TRÁI: THÔNG TIN PHIẾU NHẬP (MASTER) -->
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">Thông tin chung</div>
+                <div class="card-body">
+                    <div class="form-group mb-2">
+                        <label asp-for="ReceiptDate" class="control-label fw-bold">Ngày nhập</label>
+                        <input asp-for="ReceiptDate" type="date" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label asp-for="Note" class="control-label fw-bold">Ghi chú</label>
+                        <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success w-100">LƯU PHIẾU NHẬP</button>
+                <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Quay lại danh sách</a>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: CHI TIẾT THIẾT BỊ (DETAIL) -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-info text-white">Danh sách thiết bị nhập</div>
+                <div class="card-body">
+                    <!-- Khu vực chọn thiết bị để thêm vào lưới -->
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-5">
+                            <label>Chọn thiết bị</label>
+                            <select id="cboEquipment" class="form-control" asp-items="ViewBag.Equipments">
+                                <option value="">-- Chọn thiết bị --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Số lượng</label>
+                            <input type="number" id="txtQuantity" class="form-control" min="1" value="1" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Đơn giá nhập</label>
+                            <input type="number" id="txtPrice" class="form-control" min="0" value="0" />
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" id="btnAddRow" class="btn btn-warning">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Lưới hiển thị các thiết bị đã chọn -->
+                    <table class="table table-bordered table-striped" id="tblDetails">
+                        <thead>
+                            <tr>
+                                <th>Tên thiết bị</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Javascript sẽ đổ dữ liệu (<tr>) vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Sự kiện khi bấm nút Thêm (+)
+            $('#btnAddRow').click(function () {
+                // Lấy thông tin từ các ô nhập liệu
+                let eqId = $('#cboEquipment').val();
+                let eqName = $('#cboEquipment option:selected').text();
+                let qty = parseInt($('#txtQuantity').val());
+                let price = parseFloat($('#txtPrice').val());
+
+                // Bắt lỗi nếu chưa chọn thiết bị
+                if (!eqId) {
+                    alert("Vui lòng chọn thiết bị!");
+                    return;
+                }
+
+                // Tính thành tiền
+                let lineTotal = qty * price;
+
+                // Tạo một ID ngẫu nhiên để ASP.NET Core phân biệt các dòng
+                let rowId = Date.now(); 
+
+                // Tạo HTML cho 1 dòng <tr>
+                let trHtml = `
+                    <tr id="row-${rowId}">
+                        <td>
+                            <!-- Khai báo Index để C# bắt được dữ liệu list -->
+                            <input type="hidden" name="Details.Index" value="${rowId}" />
+                            
+                            <!-- Lưu giá trị thực tế để gửi về Controller -->
+                            <input type="hidden" name="Details[${rowId}].EquipmentId" value="${eqId}" />
+                            <input type="hidden" name="Details[${rowId}].Quantity" value="${qty}" />
+                            <input type="hidden" name="Details[${rowId}].UnitPrice" value="${price}" />
+                            
+                            ${eqName}
+                        </td>
+                        <td>${qty}</td>
+                        <td>${price.toLocaleString('vi-VN')}</td>
+                        <td class="line-total">${lineTotal.toLocaleString('vi-VN')}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove" data-id="${rowId}">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+
+                // Nối dòng vừa tạo vào cuối bảng
+                $('#tblDetails tbody').append(trHtml);
+
+                // Reset lại ô số lượng và đơn giá về mặc định
+                $('#txtQuantity').val(1);
+                $('#txtPrice').val(0);
+                $('#cboEquipment').val('');
+            });
+
+            // Sự kiện khi bấm nút Xóa trên từng dòng
+            // Dùng .on() vì đây là phần tử được sinh ra động sau khi trang đã load
+            $('#tblDetails').on('click', '.btn-remove', function () {
+                let id = $(this).data('id');
+                $(`#row-${id}`).remove();
+            });
+            
+            // Chống gửi form nếu bảng trống
+            $('#importForm').submit(function(e) {
+                if ($('#tblDetails tbody tr').length === 0) {
+                    e.preventDefault();
+                    alert("Bạn chưa thêm thiết bị nào vào phiếu nhập!");
+                }
+            });
+        });
+    </script>
+}

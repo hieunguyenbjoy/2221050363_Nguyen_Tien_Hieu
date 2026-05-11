@@ -1,0 +1,149 @@
+@model DemoMVC.ViewModels.ExportViewModel
+
+@{
+    ViewData["Title"] = "Tạo Phiếu Xuất Kho";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <div asp-validation-summary="ModelOnly" class="text-danger fw-bold"></div>
+    </div>
+}
+
+<form asp-action="Create" method="post" id="exportForm">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark fw-bold">Thông tin chung</div>
+                <div class="card-body">
+                    <div class="form-group mb-2">
+                        <label asp-for="ReceiptDate" class="control-label fw-bold">Ngày xuất</label>
+                        <input asp-for="ReceiptDate" type="date" class="form-control" required />
+                    </div>
+                    <div class="form-group mb-2">
+                        <label asp-for="Note" class="control-label fw-bold">Lý do xuất / Ghi chú</label>
+                        <textarea asp-for="Note" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-warning w-100 fw-bold">LƯU PHIẾU XUẤT</button>
+                <a asp-action="Index" class="btn btn-secondary w-100 mt-2">Quay lại danh sách</a>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">Danh sách thiết bị xuất</div>
+                <div class="card-body">
+                    <div class="row mb-3 align-items-end">
+                        <div class="col-md-5">
+                            <label>Chọn thiết bị</label>
+                            <select id="cboEquipment" class="form-control" asp-items="ViewBag.Equipments">
+                                <option value="">-- Chọn thiết bị --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Số lượng</label>
+                            <input type="number" id="txtQuantity" class="form-control" min="1" value="1" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Đơn giá xuất</label>
+                            <input type="number" id="txtPrice" class="form-control" min="0" value="0" />
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" id="btnAddRow" class="btn btn-dark">+</button>
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-striped" id="tblDetails">
+                        <thead>
+                            <tr>
+                                <th>Tên thiết bị</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#btnAddRow').click(function () {
+                let eqId = $('#cboEquipment').val();
+                let eqName = $('#cboEquipment option:selected').text();
+                let qty = parseInt($('#txtQuantity').val());
+                let price = parseFloat($('#txtPrice').val());
+
+                if (!eqId) {
+                    alert("Vui lòng chọn thiết bị!");
+                    $('#cboEquipment').focus();
+                    return;
+                }
+                if (isNaN(qty) || qty <= 0) {
+                    alert("Cảnh báo: Số lượng xuất phải lớn hơn 0!");
+                    $('#txtQuantity').focus();
+                    return;
+                }
+                if (isNaN(price) || price < 0) {
+                    alert("Cảnh báo: Đơn giá xuất không hợp lệ!");
+                    $('#txtPrice').focus();
+                    return;
+                }
+
+                let lineTotal = qty * price;
+                let rowId = Date.now(); 
+
+                let trHtml = `
+                    <tr id="row-${rowId}">
+                        <td>
+                            <input type="hidden" name="Details.Index" value="${rowId}" />
+                            <input type="hidden" name="Details[${rowId}].EquipmentId" value="${eqId}" />
+                            <input type="hidden" name="Details[${rowId}].Quantity" value="${qty}" />
+                            <input type="hidden" name="Details[${rowId}].UnitPrice" value="${price}" />
+                            ${eqName}
+                        </td>
+                        <td>${qty}</td>
+                        <td>${price.toLocaleString('vi-VN')}</td>
+                        <td class="line-total">${lineTotal.toLocaleString('vi-VN')}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm btn-remove" data-id="${rowId}">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+
+                $('#tblDetails tbody').append(trHtml);
+                $('#txtQuantity').val(1);
+                $('#txtPrice').val(0);
+                $('#cboEquipment').val('');
+            });
+
+            $('#tblDetails').on('click', '.btn-remove', function () {
+                let id = $(this).data('id');
+                $(`#row-${id}`).remove();
+            });
+            
+            $('#exportForm').submit(function(e) {
+                if ($('#tblDetails tbody tr').length === 0) {
+                    e.preventDefault();
+                    alert("Bạn chưa thêm thiết bị nào vào phiếu xuất!");
+                }
+            });
+        });
+    </script>
+}

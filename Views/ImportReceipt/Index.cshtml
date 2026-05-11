@@ -1,0 +1,54 @@
+@model IEnumerable<DemoMVC.Models.ImportReceipt>
+
+@{
+    ViewData["Title"] = "Lịch sử Nhập kho";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Tạo phiếu nhập mới</a>
+</p>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead class="bg-dark text-white">
+        <tr>
+            <th>Mã Phiếu</th>
+            <th>Ngày Nhập</th>
+            <th>Ghi chú</th>
+            <th>Tổng Tiền</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">#@item.Id</td>
+                    <td>@item.ReceiptDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.Note</td>
+                    <td class="text-danger fw-bold">@item.TotalAmount.ToString("N0") VNĐ</td>
+                    <td>
+                        <!-- Nút xem chi tiết (Chúng ta sẽ làm chức năng này sau nếu cần) -->
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Xem chi tiết</a>
+                    </td>
+                    <td>
+                        <a asp-action="Delete" asp-route-id="@item.Id" 
+                        onclick="return confirm('Bạn có chắc muốn xóa phiếu này?')" 
+                        class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                    
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="5" class="text-center">Chưa có dữ liệu phiếu nhập nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>

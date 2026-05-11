@@ -3,6 +3,7 @@ using System;
 using DemoMVC.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DemoMVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260505002229_AddInventorySystem")]
+    partial class AddInventorySystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.3");
@@ -92,7 +95,7 @@ namespace DemoMVC.Migrations
                     b.Property<int>("EquipmentId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ExportReceiptId")
+                    b.Property<int>("ImportReceiptId")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("LineTotal")
@@ -108,7 +111,7 @@ namespace DemoMVC.Migrations
 
                     b.HasIndex("EquipmentId");
 
-                    b.HasIndex("ExportReceiptId");
+                    b.HasIndex("ImportReceiptId");
 
                     b.ToTable("ExportDetails");
                 });
@@ -346,15 +349,15 @@ namespace DemoMVC.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DemoMVC.Models.ExportReceipt", "ExportReceipt")
+                    b.HasOne("DemoMVC.Models.ImportReceipt", "ImportReceipt")
                         .WithMany()
-                        .HasForeignKey("ExportReceiptId")
+                        .HasForeignKey("ImportReceiptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Equipment");
 
-                    b.Navigation("ExportReceipt");
+                    b.Navigation("ImportReceipt");
                 });
 
             modelBuilder.Entity("DemoMVC.Models.ImportDetail", b =>

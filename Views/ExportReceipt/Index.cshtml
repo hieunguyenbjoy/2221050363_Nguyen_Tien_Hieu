@@ -1,0 +1,43 @@
+@model IEnumerable<DemoMVC.Models.ExportReceipt>
+
+@{
+    ViewData["Title"] = "Lịch sử Xuất kho";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<p>
+    <a asp-action="Create" class="btn btn-warning fw-bold">Tạo phiếu xuất mới</a>
+</p>
+
+<table class="table table-bordered table-striped table-hover">
+    <thead class="bg-dark text-white">
+        <tr>
+            <th>Mã Phiếu</th>
+            <th>Ngày Xuất</th>
+            <th>Lý do xuất</th>
+            <th>Tổng Tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td class="fw-bold">#@item.Id</td>
+                    <td>@item.ReceiptDate.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.Note</td>
+                    <td class="text-danger fw-bold">@item.TotalAmount.ToString("N0") VNĐ</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">Chưa có dữ liệu phiếu xuất nào.</td>
+            </tr>
+        }
+    </tbody>
+</table>
