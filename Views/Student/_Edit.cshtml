@@ -1,0 +1,39 @@
+@model DemoMVC.Models.Student
+
+<div class="modal fade" id="studentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark fw-bold">
+                <h5 class="modal-title">Cập nhật Sinh Viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmEdit">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tên Sinh Viên</label>
+                        <input type="text" class="form-control" name="Name" value="@Model.Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tuổi</label>
+                        <input type="number" class="form-control" name="Age" value="@Model.Age" min="18" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Địa chỉ</label>
+                        <input type="text" class="form-control" name="Address" value="@Model.Address" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Khoa</label>
+                        <select class="form-control" name="FacultyId" asp-items="ViewBag.Faculties" asp-for="FacultyId"></select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-warning fw-bold" id="btnSaveEdit">Lưu Thay Đổi</button>
+            </div>
+        </div>
+    </div>
+</div>

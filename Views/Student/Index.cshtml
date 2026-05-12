@@ -1,31 +1,133 @@
-@model List<DemoMVC.ViewModels.StudentFacultyViewModel>
-
-<<h2>Danh sách sinh viên</h2>
-
-<a href="/Student/Create" class="btn btn-success mb-3">Thêm mới</a>
-
-<a href="/Student/ImportExcel" class="btn btn-primary mb-3">
-    Import Excel
-</a>
-
-<table border="1">
-<tr>
-    <th>ID</th>
-    <th>Họ tên</th>
-    <th>Khoa</th>
-    <th>Action</th>
-</tr>
-
-@foreach(var item in Model)
-{
-<tr>
-    <td>@item.Id</td>
-    <td>@item.Name</td>
-    <td>@item.FacultyName</td>
-    <td>
-        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-    </td>
-</tr>
+@{
+    ViewData["Title"] = "Quản lý Sinh Viên (Ajax)";
 }
-</table> *
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Danh sách Sinh Viên</h2>
+        <button class="btn btn-primary" id="btnCreate">Thêm Sinh Viên Mới</button>
+    </div>
+
+    <div id="studentTableContainer">
+        <div class="text-center mt-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Đang tải dữ liệu...</p>
+        </div>
+    </div>
+</div>
+
+<div id="modalContainer"></div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+        
+            // 1. TẢI DANH SÁCH & THÊM MỚI
+          
+            loadStudentTable();
+
+            function loadStudentTable(page = 1) {
+                $.ajax({
+                    url: '/Student/GetStudents',
+                    type: 'GET',
+                    data: { page: page, pageSize: 10 },
+                    success: function (result) {
+                        $('#studentTableContainer').html(result);
+                    },
+                    error: function () {
+                        $('#studentTableContainer').html('<p class="text-danger text-center fw-bold">Có lỗi xảy ra khi tải dữ liệu từ Server!</p>');
+                    }
+                });
+            }
+
+            $('#btnCreate').click(function () {
+                $.get('/Student/Create', function (htmlForm) {
+                    $('#modalContainer').html(htmlForm);
+                    $('#studentModal').modal('show'); 
+                });
+            });
+
+            $(document).on('click', '#btnSaveCreate', function () {
+                let formData = $('#frmCreate').serialize(); 
+
+                $.post('/Student/Create', formData, function (response) {
+                    if (response.success === true) {
+                        $('#studentModal').modal('hide'); 
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                        
+                        loadStudentTable(); 
+                        alert("Thêm sinh viên thành công!");
+                    } else {
+                        alert("Lưu thất bại, vui lòng kiểm tra lại thông tin!");
+                    }
+                });
+            });
+
+            
+            // 2. CHỨC NĂNG SỬA (EDIT)
+            
+            $(document).on('click', '.btn-edit', function () {
+                let id = $(this).data('id'); 
+                
+                $.get('/Student/Edit/' + id, function (htmlForm) {
+                    $('#modalContainer').html(htmlForm);
+                    $('#studentModal').modal('show');
+                });
+            });
+
+            $(document).on('click', '#btnSaveEdit', function () {
+                let formData = $('#frmEdit').serialize();
+
+                $.post('/Student/Edit', formData, function (response) {
+                    if (response.success === true) {
+                        $('#studentModal').modal('hide');
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                        
+                        loadStudentTable(); 
+                        alert("Cập nhật thông tin thành công!");
+                    } else {
+                        alert("Cập nhật thất bại, vui lòng kiểm tra lại!");
+                    }
+                });
+            });
+
+         
+            // 3. CHỨC NĂNG XÓA (DELETE)
+           
+            $(document).on('click', '.btn-delete', function () {
+                let id = $(this).data('id');
+                
+                $.get('/Student/Delete/' + id, function (htmlForm) {
+                    $('#modalContainer').html(htmlForm);
+                    $('#studentModal').modal('show');
+                });
+            });
+
+            $(document).on('click', '#btnSaveDelete', function () {
+                let formData = $('#frmDelete').serialize();
+
+                $.post('/Student/Delete', formData, function (response) {
+                    if (response.success === true) {
+                        $('#studentModal').modal('hide');
+                        $('body').removeClass('modal-open');
+                        $('.modal-backdrop').remove();
+                        
+                        loadStudentTable(); 
+                        alert("Đã xóa sinh viên khỏi hệ thống!");
+                    } else {
+                        alert("Xóa thất bại!");
+                    }
+                });
+            });
+            // 4. XỬ LÝ CHUYỂN TRANG
+            $(document).on('click', '.btn-pagination', function () {
+                let page = $(this).data('page'); // Lấy số trang (1, 2, 3...) mà em vừa bấm
+                loadStudentTable(page); // Ra lệnh cho Ajax tải lại bảng với trang đó
+            });
+
+        });
+    </script>
+}

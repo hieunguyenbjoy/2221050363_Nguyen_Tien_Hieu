@@ -8,122 +8,146 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using DemoMVC.Services;
 using System.Linq; 
-using System; // Cần thiết cho Console.WriteLine
+using System;
+using System.Threading.Tasks; // Cần thiết cho async/await
 
 namespace DemoMVC.Controllers
 {
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;
-        
-        // 1. Khai báo thêm ExcelService
         private readonly ExcelService _excelService; 
 
-        // 2. Truyền ExcelService vào hàm khởi tạo
         public StudentController(ApplicationDbContext context, ExcelService excelService)
         {
             _context = context;
             _excelService = excelService;
         }
 
-        // --- CÁC HÀM CŨ GIỮ NGUYÊN ---
-        public IActionResult Create()
+        // 1. Khung tranh trống
+        public IActionResult Index()
         {
-            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName");
             return View();
         }
 
+        // 2. Lấy dữ liệu bảng (Read)
+        public async Task<IActionResult> GetStudents(int page = 1, int pageSize = 10)
+        {
+            var query = _context.Students
+                .Include(s => s.Faculty)
+                .AsNoTracking()
+                .OrderByDescending(x => x.Id);
+
+            var totalItems = await query.CountAsync();
+
+            var students = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var result = new PagedResult<Student>
+            {
+                Items = students,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = totalItems
+            };
+
+            return PartialView("_StudentTable", result);
+        }
+
+        // 3. Form Thêm mới (GET)
+        [HttpGet]
+        public IActionResult Create()
+        {
+            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName");
+            return PartialView("_Create");
+        }
+
+        // 4. Xử lý Lưu Thêm mới (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(DemoMVC.Models.Student student)
+        public async Task<IActionResult> Create(Student student)
         {
             if (!ModelState.IsValid)
             {
-                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
-                {
-                    Console.WriteLine(error.ErrorMessage);
-                }
+                ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName", student.FacultyId);
+                return PartialView("_Create", student);
             }
 
-            if (ModelState.IsValid)
-            {
-                _context.Students.Add(student);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
-            }
+            _context.Students.Add(student);
+            await _context.SaveChangesAsync();
 
-            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName");
-            return View(student);
+            return Json(new { success = true });
         }
 
-        public IActionResult Edit(int? id)
+        // 5. Form Cập nhật (GET)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
-            var student = _context.Students.Find(id);
+            var student = await _context.Students.FindAsync(id);
             if (student == null) return NotFound();
-            return View(student);
+
+            ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName", student.FacultyId);
+            return PartialView("_Edit", student);
         }
 
+        // 6. Xử lý Lưu Cập nhật (POST)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, DemoMVC.Models.Student student)
+        public async Task<IActionResult> Edit(Student student)
         {
-            if (id != student.Id) return NotFound();
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Students.Update(student);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+                ViewBag.Faculties = new SelectList(_context.Faculties, "FacultyId", "FacultyName", student.FacultyId);
+                return PartialView("_Edit", student);
             }
-            return View(student);
+
+            var existingStudent = await _context.Students.FindAsync(student.Id);
+            if (existingStudent == null) return NotFound();
+
+            existingStudent.Name = student.Name;
+            existingStudent.Age = student.Age;
+            existingStudent.Address = student.Address;
+            existingStudent.FacultyId = student.FacultyId;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
         }
 
-        public IActionResult Delete(int? id)
+        // 7. Form Xác nhận Xóa (GET)
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null) return NotFound();
-            var student = _context.Students.Find(id);
-            if (student == null) return NotFound();
-            return View(student);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
-        {
-            var student = _context.Students.Find(id);
-            if (student != null)
-            {
-                _context.Students.Remove(student);
-                _context.SaveChanges();
-            }
-            return RedirectToAction(nameof(Index));
-        }
-
-        public IActionResult Details(int? id)
-        {
-            if (id == null) return NotFound();
-            var student = _context.Students.Find(id);
-            if (student == null) return NotFound();
-            return View(student);
-        }
-
-        public IActionResult Index()
-        {
-            var studentsWithFaculty = _context.Students
+            var student = await _context.Students
                 .Include(s => s.Faculty)
-                .Select(s => new StudentFacultyViewModel
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                    FacultyName = s.Faculty.FacultyName
-                })
-                .ToList();
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            return View(studentsWithFaculty);
+            if (student == null) return NotFound();
+
+            return PartialView("_Delete", student);
         }
 
-        // --- IMPORT EXCEL ĐÃ ĐƯỢC CẬP NHẬT ---
+        // 8. Xử lý Xóa (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Student student)
+        {
+            var existingStudent = await _context.Students.FindAsync(student.Id);
+
+            if (existingStudent == null)
+            {
+                return Json(new { success = false });
+            }
+
+            _context.Students.Remove(existingStudent);
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
         public IActionResult ImportExcel()
         {
             return View();
@@ -135,10 +159,8 @@ namespace DemoMVC.Controllers
             if (file == null || file.Length == 0)
                 return RedirectToAction("Index");
 
-            // Gọi máy đa năng, truyền hướng dẫn lắp ráp thành Student
             var importedStudents = _excelService.ReadExcel<Student>(file, rowData =>
             {
-                // Kiểm tra nếu tên rỗng thì bỏ qua
                 if (string.IsNullOrWhiteSpace(rowData[0])) return null; 
 
                 return new Student
@@ -153,7 +175,6 @@ namespace DemoMVC.Controllers
             if (importedStudents == null || importedStudents.Count == 0)
                 return RedirectToAction("Index");
 
-            // Lưu vào database và check trùng
             foreach (var student in importedStudents)
             {
                 bool isDuplicate = _context.Students.Any(s => s.Name.ToLower().Trim() == student.Name.ToLower().Trim());

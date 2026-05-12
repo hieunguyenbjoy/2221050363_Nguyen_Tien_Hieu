@@ -1,0 +1,29 @@
+@model DemoMVC.Models.Student
+
+<div class="modal fade" id="studentModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white fw-bold">
+                <h5 class="modal-title">Xác nhận Xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmDelete">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="Id" value="@Model.Id" />
+                    
+                    <p class="text-danger fw-bold fs-5">Bạn có chắc chắn muốn xóa sinh viên này không?</p>
+                    <table class="table table-bordered">
+                        <tr><th style="width: 120px;">Tên:</th><td>@Model.Name</td></tr>
+                        <tr><th>Khoa:</th><td>@(Model.Faculty?.FacultyName ?? "Chưa có khoa")</td></tr>
+                    </table>
+                    <p class="text-muted fst-italic mb-0">Hành động này sẽ xóa dữ liệu vĩnh viễn khỏi hệ thống!</p>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger fw-bold" id="btnSaveDelete">Xóa Ngay</button>
+            </div>
+        </div>
+    </div>
+</div>
